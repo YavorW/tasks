@@ -1,0 +1,15 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+
+.form-group.required>label:not(:empty)::after {
+  content: ' *';
+  color: red;
+}
+.select2-container .select2-search--inline { width: 100% !important; }
