@@ -20,9 +20,7 @@ use Illuminate\Support\Facades\Route;
 |
  */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', 'home');
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/profile', [Client\ProfileController::class, 'profile'])->name('profile');
     Route::put('/profile', [Client\ProfileController::class, 'update'])->name('profile.update');

@@ -4,6 +4,9 @@ use App\Models\Task;
 ?>
 <div class="card mx-3">
   <style>
+    .task-table td:nth-child(2) {
+      min-width: 300px
+    }
     .task-table td:nth-child(5) {
       min-width: 120px
     }
@@ -32,6 +35,21 @@ use App\Models\Task;
       max-width: 235px;
       max-height: 235px;
     }
+    td .max-235 {
+      display: block;
+    }
+    .zoom-overlay-open .table-responsive {
+      overflow : initial;
+    }
+    img.zoom-img {
+      max-height: none;
+      max-width: none;
+    }
+    .zoom-img, .zoom-img-wrap {
+      -webkit-transition: easy-out 300ms; 
+      -o-transition: easy-out 300ms;
+      transition: easy-out 300ms;
+    }
   </style>
   <div class="card-body">
     <div class="table-responsive">
@@ -52,14 +70,14 @@ use App\Models\Task;
           @include('client.projects.filters')
         </tr>
         @foreach ($tasks as $task)
-          <tr x-data='task(@json($task, 256))' x-on:task-reload.window="if($event.detail.task.id == id) reload($event.detail.task)" >
+          <tr x-data="task(@js($task))" x-on:task-reload.window="if($event.detail.task.id == id) reload($event.detail.task)" >
             <td>
               <a href="{{ route('projects.show', [$project->id, 'task' => $task->id]) }}"
                 class="btn btn-outline-primary" x-on:click='open($dispatch); $event.preventDefault();'
                 x-on:open-task.window="if($event.detail.id == id) open($dispatch)">{{ $task->id }}</a>
             </td>
             <td>
-              {{ $task->subject }}
+              {!! nl2br($task->subject) !!}
               @if (isset($task->files()['task']) && !empty($task->files()['task']))
                 @foreach ($task->files()['task'] as $img)
                   <img src="{{ $task->asset($img) }}" class="max-235 img-thumbnail m-1" data-action="zoom">
@@ -67,7 +85,7 @@ use App\Models\Task;
               @endif
             </td>
             <td>
-              {{ $task->description }}
+              {!! nl2br($task->description) !!}
               @if (isset($task->files()['description']) && !empty($task->files()['description']))
                 @foreach ($task->files()['description'] as $img)
                   <img src="{{ $task->asset($img) }}" class="max-235 img-thumbnail m-1" data-action="zoom">
@@ -75,7 +93,7 @@ use App\Models\Task;
               @endif
             </td>
             <td>
-              {{ $task->steps_to_reproduce }}
+              {!! nl2br($task->steps_to_reproduce) !!}
               @if (isset($task->files()['steps']) && !empty($task->files()['steps']))
                 @foreach ($task->files()['steps'] as $img)
                   <img src="{{ $task->asset($img) }}" class="max-235 img-thumbnail m-1" data-action="zoom">

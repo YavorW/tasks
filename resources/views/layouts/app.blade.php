@@ -108,7 +108,7 @@
         <div class="container">
             <div class="d-flex justify-content-between">
                 <div>
-                    <h1 class="d-inline-block me-3">{{ $page_title }}</h1>
+                    <h1 class="d-inline-block me-3">{{ $page_title ?? '' }}</h1>
                     @if(isset($actions))
                     @foreach($actions as $action)
                     <a class="btn {{ $action['type'] }} mr-2 mb-3" href="{{ $action['link'] }}">
