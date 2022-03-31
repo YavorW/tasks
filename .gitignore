@@ -19,3 +19,6 @@ error_log
 public/error_log
 *.DS_Store
 
+.htaccess
+php.fcgi
+php74-fcgi.ini

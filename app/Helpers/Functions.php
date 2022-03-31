@@ -5,6 +5,12 @@ use Illuminate\Support\Facades\Http;
 
 define('paginate', 9); // по колко на брой елемента да има при странициране
 
+
+function convertUrlsToLinks($input) {
+    $pattern = '@(http(s)?://)?(([a-zA-Z])([-\w]+\.)+([^\s\.]+[^\s]*)+[^,.\s])@';
+    return $output = preg_replace($pattern, '<a href="http$2://$3" target="_blank" referrerpolicy="no-referrer">$0</a>', $input);
+ }
+
 /**
  * Логване на активност
  * @param $model_type

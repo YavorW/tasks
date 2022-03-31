@@ -109,6 +109,9 @@
             <div class="d-flex justify-content-between">
                 <div>
                     <h1 class="d-inline-block me-3">{{ $page_title ?? '' }}</h1>
+                    {{-- добавяне на действия бутони --}}
+                    @stack('actions')
+
                     @if(isset($actions))
                     @foreach($actions as $action)
                     <a class="btn {{ $action['type'] }} mr-2 mb-3" href="{{ $action['link'] }}">
@@ -118,6 +121,7 @@
                         {{ $action['anchor'] }}
                     </a>
                     @endforeach
+
                     @if (isset($delete))
                     <form method="POST" action="{{ $delete }}" class="d-inline" onSubmit="return confirm('Потвърди?')">
                         @csrf()
@@ -134,7 +138,7 @@
 
                     {{-- Breadcrumbs --}}
                     @if (isset($breadcrumbs) && is_array($breadcrumbs) && count($breadcrumbs))
-                    <ol class="breadcrumb float-sm-right">
+                    <ol class="breadcrumb float-sm-right mt-2">
                         @foreach ($breadcrumbs as $label => $link)
                         @if ($link)
                         <li class="breadcrumb-item text-capitalize"><a href="{{ $link }}">{{ $label }}</a></li>
@@ -161,7 +165,7 @@
 
     <footer class="mt-auto container mb-3">
         <div class="text-end text-muted">
-            версия 0.1-алфа; поздрави от Явката
+            версия 0.3-алфа; поздрави от Явката {!! config('app.footer') !!}
         </div>
     </footer>
 

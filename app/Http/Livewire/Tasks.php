@@ -97,6 +97,12 @@ class Tasks extends Component
         }
     }
 
+    public function deleteTask(Task $task)
+    {
+        TaskRepository::delete($task);
+        $this->emit('alert', ['type' => 'success', 'message' => "Задачата е изтрита."]);
+    }
+
     /** Създаване на коментар */
     public function addComment($task_id, $comment)
     {

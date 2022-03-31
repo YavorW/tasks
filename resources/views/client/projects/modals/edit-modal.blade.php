@@ -21,7 +21,10 @@ use App\Models\Task;
       },
       history: null,
       comments: null,
+      modal: null,
       init() {
+        this.modal = new bootstrap.Modal(document.getElementById('edit-modal'));
+
         // качване на снимка от клипборда
         $('.pastejs.edit').pastableTextarea();
 
@@ -37,8 +40,6 @@ use App\Models\Task;
         });
       },
       loadTask(task) {
-        const edit_modal = new bootstrap.Modal(document.getElementById('edit-modal'));
-
         this.id = task.id;
         this.subject = task.subject;
         this.description = task.description;
@@ -52,7 +53,7 @@ use App\Models\Task;
         this.history = task.history;
         this.comments = task.comments;
 
-        edit_modal.show();
+        this.modal.show();
       },
       getData() {
         return {
@@ -78,12 +79,20 @@ use App\Models\Task;
 
       save() {
         @this.taskUpdate(this.id, this.getData());
+      },
+
+      destroy() {
+        if (confirm('Да се изтрие')) {
+          @this.deleteTask(this.id);
+          this.modal.hide();
+        }
       }
     }
   }
 </script>
-<div class="modal fade" id="edit-modal" tabindex="-1" data-bs-backdrop="static" x-data="editModal()"
-  x-on:load-task.window="loadTask($event.detail)" x-init="init"
+<div class="modal fade" id="edit-modal" tabindex="-1" data-bs-backdrop="static" 
+x-data="editModal()" x-init="init()"
+  x-on:load-task.window="loadTask($event.detail)"
   x-on:paste-image.window="if($event.detail.modal == 'edit') pasteImage($event.detail.type, $event.detail.uri)">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
@@ -251,7 +260,8 @@ use App\Models\Task;
           </div>
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer d-flex justify-content-between">
+        <button type="button" class="btn btn-danger" x-on:click="destroy()">Изтрий</button>
         <button type="button" class="btn btn-primary" x-on:click="save()" data-bs-dismiss="modal">Запази</button>
       </div>
     </div>

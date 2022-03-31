@@ -75,6 +75,7 @@ class TaskRepository
 
     public static function delete(Task $task)
     {
+        $task->comments()->delete();
         $task->delete();
     }
 }

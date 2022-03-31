@@ -4,13 +4,13 @@ use App\Models\Task;
 ?>
 <div class="card mx-3">
   <style>
-    .task-table td:nth-child(2) {
+    .task-table td:nth-child(2),
+    .task-table td:nth-child(3),
+    .task-table td:nth-child(4)
+     {
       min-width: 300px
     }
-    .task-table td:nth-child(5) {
-      min-width: 120px
-    }
-
+    .task-table td:nth-child(5),
     .task-table td:nth-child(6) {
       min-width: 120px
     }
@@ -23,10 +23,7 @@ use App\Models\Task;
       min-width: 130px
     }
 
-    .task-table td:nth-child(9) {
-      min-width: 200px
-    }
-
+    .task-table td:nth-child(9),
     .task-table td:nth-child(10) {
       min-width: 200px
     }
@@ -59,9 +56,9 @@ use App\Models\Task;
           <th>Задача</th>
           <th>Описание</th>
           <th>Стъпки за пресъздаване</th>
+          <th>Статус</th>
           <th>Тип</th>
           <th>Приоритет</th>
-          <th>Статус</th>
           <th>За екип</th>
           <th>Изпълнител</th>
           <th>Коментари</th>
@@ -73,11 +70,23 @@ use App\Models\Task;
           <tr x-data="task(@js($task))" x-on:task-reload.window="if($event.detail.task.id == id) reload($event.detail.task)" >
             <td>
               <a href="{{ route('projects.show', [$project->id, 'task' => $task->id]) }}"
-                class="btn btn-outline-primary" x-on:click='open($dispatch); $event.preventDefault();'
-                x-on:open-task.window="if($event.detail.id == id) open($dispatch)">{{ $task->id }}</a>
+                class="btn border-2"
+                x-bind:class="{
+                  'btn-primary': status == {{ Task::status_to_do }},
+                  'btn-info': status == {{ Task::status_in_progress }},
+                  'btn-secondary': status == {{ Task::status_awaiting_upload }},
+                  'btn-dark': status == {{ Task::status_ready_for_qa }},
+                  'btn-success': status == {{ Task::status_resolved }},
+                  'btn-danger': status == {{ Task::status_not_resolved }},
+                  'btn-warning': status == {{ Task::status_awaiting_feedback }},
+                }"
+
+                x-on:click='open($dispatch); $event.preventDefault();'
+                x-on:open-task.window="if($event.detail.id == id) open($dispatch)"
+                >{{ $task->id }}</a>
             </td>
             <td>
-              {!! nl2br($task->subject) !!}
+              {!! convertUrlsToLinks(nl2br($task->subject)) !!}
               @if (isset($task->files()['task']) && !empty($task->files()['task']))
                 @foreach ($task->files()['task'] as $img)
                   <img src="{{ $task->asset($img) }}" class="max-235 img-thumbnail m-1" data-action="zoom">
@@ -85,7 +94,7 @@ use App\Models\Task;
               @endif
             </td>
             <td>
-              {!! nl2br($task->description) !!}
+              {!! convertUrlsToLinks(nl2br($task->description)) !!}
               @if (isset($task->files()['description']) && !empty($task->files()['description']))
                 @foreach ($task->files()['description'] as $img)
                   <img src="{{ $task->asset($img) }}" class="max-235 img-thumbnail m-1" data-action="zoom">
@@ -93,12 +102,34 @@ use App\Models\Task;
               @endif
             </td>
             <td>
-              {!! nl2br($task->steps_to_reproduce) !!}
+              {!! convertUrlsToLinks(nl2br($task->steps_to_reproduce)) !!}
               @if (isset($task->files()['steps']) && !empty($task->files()['steps']))
                 @foreach ($task->files()['steps'] as $img)
                   <img src="{{ $task->asset($img) }}" class="max-235 img-thumbnail m-1" data-action="zoom">
                 @endforeach
               @endif
+            </td>
+            <td>
+              <x-form.select x-model="status" x-on:change="update($event, 'status')"
+                class="border border-2"
+                x-bind:class="{
+                  'border-primary': status == {{ Task::status_to_do }},
+                  'border-info': status == {{ Task::status_in_progress }},
+                  'border-secondary': status == {{ Task::status_awaiting_upload }},
+                  'border-dark': status == {{ Task::status_ready_for_qa }},
+                  'border-success': status == {{ Task::status_resolved }},
+                  'border-danger': status == {{ Task::status_not_resolved }},
+                  'border-warning': status == {{ Task::status_awaiting_feedback }},
+                }"
+              >
+                <option value="{{ Task::status_to_do }}">To Do</option>
+                <option value="{{ Task::status_in_progress }}">In progress</option>
+                <option value="{{ Task::status_awaiting_upload }}">Awaiting Upload</option>
+                <option value="{{ Task::status_ready_for_qa }}">Ready for QA</option>
+                <option value="{{ Task::status_resolved }}">Resolved</option>
+                <option value="{{ Task::status_not_resolved }}">Not Resolved</option>
+                <option value="{{ Task::status_awaiting_feedback }}">Awaiting Feedback</option>
+              </x-form.select>
             </td>
             <td>
               <x-form.select x-model="type" x-on:change="update($event, 'type')">
@@ -114,17 +145,6 @@ use App\Models\Task;
                 <option value="{{ Task::priority_medium }}">Medium</option>
                 <option value="{{ Task::priority_high }}">High</option>
                 <option value="{{ Task::priority_highest }}">Highest</option>
-              </x-form.select>
-            </td>
-            <td>
-              <x-form.select x-model="status" x-on:change="update($event, 'status')">
-                <option value="{{ Task::status_to_do }}">To Do</option>
-                <option value="{{ Task::status_in_progress }}">In progress</option>
-                <option value="{{ Task::status_awaiting_upload }}">Awaiting Upload</option>
-                <option value="{{ Task::status_ready_for_qa }}">Ready for QA</option>
-                <option value="{{ Task::status_resolved }}">Resolved</option>
-                <option value="{{ Task::status_not_resolved }}">Not Resolved</option>
-                <option value="{{ Task::status_awaiting_feedback }}">Awaiting Feedback</option>
               </x-form.select>
             </td>
             <td>
@@ -168,7 +188,7 @@ use App\Models\Task;
     </div>
 
     <div wire:ignore>
-      <div class="text-center">
+      <div class="text-center mt-2">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create-modal">
           <i class="fas fa-plus-circle"></i> Добави задача
         </button>
@@ -257,6 +277,11 @@ use App\Models\Task;
     </div>
   </div>
 </div>
+@push('actions')
+<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#create-modal">
+  <i class="fas fa-plus-circle"></i> Добави задача
+</button>
+@endpush
 @push('styles')
   <link rel="stylesheet" href="{{ asset('plugins/zoom.js/css/zoom.css') }}">
 @endpush
